@@ -1,53 +1,54 @@
-Écrire un programme en C++ qui illustre le concept du boson de Higgs et la brisure spontanée de symétrie en théorie des champs est un défi complexe. Cependant, nous pouvons créer une simplification en utilisant des concepts de base de la physique théorique et de la théorie des champs.
+# Higgs — brisure spontanée de symétrie en C++
 
-Contexte Théorique
-En théorie des champs, la brisure spontanée de symétrie et le boson de Higgs peuvent être illustrés à l'aide du potentiel de Higgs. Le potentiel de Higgs est souvent représenté par une fonction en forme de "chapeau mexicain" :
+Programme pédagogique et vérifié numériquement illustrant le mécanisme de Higgs.
+Champ scalaire à `N` composantes réelles (`N=1` : Z2, `N=2` : chapeau mexicain U(1), `N=4` : doublet du Modèle Standard) :
 
-V
-(
-ϕ
-)
-=
-μ
-2
-ϕ
-2
-+
-λ
-ϕ
-4
-où (\phi) est le champ de Higgs, (\mu) est un paramètre de masse, et (\lambda) est un paramètre d'auto-interaction.
+```
+V(φ) = −½ μ² |φ|² + ¼ λ |φ|⁴ + μ⁴/(4λ)        (constante : V = 0 dans le vide)
+```
 
-Lorsque (\mu^2 < 0), la symétrie du potentiel est brisée spontanément, et le champ de Higgs acquiert une valeur non nulle dans le vide, ce qui donne naissance au boson de Higgs.
+> Correction par rapport à la première version : `V = μ²φ² + λφ⁴` avec `μ² > 0` n'a qu'un seul minimum et ne brise aucune symétrie ; le terme quadratique doit être **négatif**.
 
-Explications
-Définition des Paramètres :
+## Résultats analytiques utilisés
 
-mu et lambda sont les paramètres du potentiel de Higgs.
-points définit le nombre de points pour la simulation.
-Fonction higgs_potential :
+| Grandeur | Formule |
+|---|---|
+| vev | `v = μ/√λ` |
+| masse du Higgs | `m_h = √2 μ` |
+| Goldstones | `N−1` modes de masse nulle |
+| température critique | `T_c² = 24 μ² / ((N+2) λ)` |
+| mur de domaine (N=1) | `φ(x) = v tanh(μx/√2)`, énergie `(2√2/3) μ³/λ` |
+| W, Z, fermion (`--sm`) | `g v/2`, `√(g²+g'²) v/2`, `y v/√2` |
 
-Calcule la valeur du potentiel de Higgs pour une valeur donnée du champ (\phi).
-Fonction calculate_potential :
+## Compilation et utilisation
 
-Calcule les valeurs du potentiel pour une série de valeurs de (\phi).
-Fonction print_results :
+```
+make            # ou : g++ -O2 -std=c++17 higgs.cpp -o higgs
+./higgs         # toutes les sections
+./higgs --help
+```
 
-Affiche les résultats sous forme de table.
-Bloc Principal :
+| Commande | Contenu |
+|---|---|
+| `info` | paramètres, vev, masses, `T_c` |
+| `potential` | table + courbe ASCII de V, V', V'' (`--csv f.csv` pour exporter) |
+| `hat` | chapeau mexicain vu de dessus |
+| `vacuum` | minimisation (Newton) et masses par Hessien discret : Higgs massif, Goldstones nuls |
+| `oscillation` | dynamique RK4 autour du vide ; la fréquence mesurée redonne `m_h` |
+| `kink` | mur de domaine 1+1D sur réseau, kink boosté : énergie `γM`, vitesse, conservation |
+| `thermal` | `v(T)`, transition du second ordre, restauration de la symétrie |
+| `test` | toutes les vérifications ; code de sortie 1 en cas d'échec |
 
-Génère les valeurs du champ (\phi) dans la plage de -2 à 2.
-Calcule les valeurs du potentiel de Higgs correspondantes.
-Affiche les résultats.
-Utilisation
-Compilez le programme avec un compilateur C++ :
+Options : `--mu`, `--lambda`, `--n`, `--points`, `--range`, `--csv`, `--sm` (v = 246,22 GeV, m_h = 125,25 GeV, N = 4).
 
-g++ higgs.cpp -o higgs
-Exécutez le programme :
+Exemples :
 
-./higgs
-Le programme affichera une table des valeurs du champ (\phi) et du potentiel (V(\phi)), illustrant la forme du potentiel de Higgs et la brisure spontanée de symétrie.
+```
+./higgs test --n 2
+./higgs info --sm
+./higgs thermal --lambda 0.13 --mu 2 --csv thermal.csv
+```
 
-Notes
-Simplification : Ce programme est une simplification extrême et ne capture pas toutes les nuances de la théorie des champs et du mécanisme de Higgs.
-Extension : Pour une simulation plus réaliste, il faudrait intégrer des concepts plus avancés comme la dynamique des champs quantiques et les interactions avec d'autres particules.
+## Limites
+
+Théorie classique (arbre) ; la partie thermique utilise l'approximation haute température à l'ordre `T²`. Les corrections quantiques (potentiel de Coleman–Weinberg, boucles) ne sont pas incluses.
